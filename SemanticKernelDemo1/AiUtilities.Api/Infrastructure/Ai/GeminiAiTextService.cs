@@ -11,6 +11,8 @@ public sealed class GeminiAiTextService : IAiTextService
 {
     private readonly Kernel _kernel;
     private readonly KernelFunction _summarizeFunction;
+    private readonly KernelFunction _rewriteFunction;
+    private readonly KernelFunction _classifyFunction;
 
     public GeminiAiTextService()
     {
@@ -40,6 +42,34 @@ public sealed class GeminiAiTextService : IAiTextService
             prompt,
             functionName: "Summarize"
         );
+
+        var rewritePrompt = """
+        Rewrite the following text in a {{$tone}} tone.
+        Preserve the meaning. Improve clarity. Do not add new facts.
+        Return only the rewritten text.
+
+        Text:
+        {{$text}}
+        """;
+
+        _rewriteFunction = _kernel.CreateFunctionFromPrompt(
+            rewritePrompt,
+             functionName: "Rewrite"
+             );
+
+        var classifyPrompt = """
+        Classify the following text into exactly ONE of these labels:
+        Bug, Feature, Question, Other
+
+        Rules:
+        - Return ONLY the label word.
+        - If unsure, return Other.
+
+        Text:
+        {{$text}}
+        """;
+
+        _classifyFunction = _kernel.CreateFunctionFromPrompt(classifyPrompt, functionName: "Classify");
     }
 
     public async Task<string> SummarizeAsync(string text, int bulletCount = 3)
@@ -54,4 +84,26 @@ public sealed class GeminiAiTextService : IAiTextService
 
         return result.ToString();
     }
+
+    public async Task<string> RewriteAsync(string text, string tone = "professional")
+    {
+        var result = await _kernel.InvokeAsync(_rewriteFunction, new KernelArguments
+        {
+            ["text"] = text,
+            ["tone"] = tone
+        });
+
+        return result.ToString();
+    }
+
+    public async Task<string> ClassifyAsync(string text)
+    {
+        var result = await _kernel.InvokeAsync(_classifyFunction, new KernelArguments
+        {
+            ["text"] = text
+        });
+
+        return result.ToString().Trim();
+    }
+
 }
