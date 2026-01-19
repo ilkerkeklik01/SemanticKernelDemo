@@ -1,0 +1,17 @@
+{
+  "schema": 1,
+  "description": "Classify text into a category.",
+  "execution_settings": {
+      "default": {
+          "max_tokens": 128,
+          "temperature": 0.0
+      }
+  },
+  "input_variables": [
+    {
+      "name": "text",
+      "description": "The text to classify",
+      "required": true
+    }
+  ]
+}

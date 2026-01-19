@@ -22,54 +22,21 @@ public sealed class GeminiAiTextService : IAiTextService
         var builder = Kernel.CreateBuilder();
 
         builder.AddGoogleAIGeminiChatCompletion(
-            modelId: "gemini-flash-latest",
+            modelId: "gemini-2.5-flash-lite",
             apiKey: apiKey
         );
 
         _kernel = builder.Build();
 
-        var prompt = """
-        Summarize the following text into {{$bulletCount}} concise bullet points.
-        Use neutral, professional language.
-        Do not add new information or opinions.
-        If the text is short, keep bullets very concise.
+        var baseDir = AppContext.BaseDirectory;
+        var promptsPath = Path.Combine(baseDir, "Prompts", "Text");
 
-        Text:
-        {{$text}}
-        """;
+        var textPlugin = _kernel.CreatePluginFromPromptDirectory(promptsPath, pluginName: "Text");
+        _kernel.Plugins.Add(textPlugin);
 
-        _summarizeFunction = _kernel.CreateFunctionFromPrompt(
-            prompt,
-            functionName: "Summarize"
-        );
-
-        var rewritePrompt = """
-        Rewrite the following text in a {{$tone}} tone.
-        Preserve the meaning. Improve clarity. Do not add new facts.
-        Return only the rewritten text.
-
-        Text:
-        {{$text}}
-        """;
-
-        _rewriteFunction = _kernel.CreateFunctionFromPrompt(
-            rewritePrompt,
-             functionName: "Rewrite"
-             );
-
-        var classifyPrompt = """
-        Classify the following text into exactly ONE of these labels:
-        Bug, Feature, Question, Other
-
-        Rules:
-        - Return ONLY the label word.
-        - If unsure, return Other.
-
-        Text:
-        {{$text}}
-        """;
-
-        _classifyFunction = _kernel.CreateFunctionFromPrompt(classifyPrompt, functionName: "Classify");
+        _summarizeFunction = textPlugin["Summarize"];
+        _rewriteFunction = textPlugin["Rewrite"];
+        _classifyFunction = textPlugin["Classify"];
     }
 
     public async Task<string> SummarizeAsync(string text, int bulletCount = 3)

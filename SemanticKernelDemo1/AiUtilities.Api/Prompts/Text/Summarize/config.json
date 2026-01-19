@@ -1,0 +1,22 @@
+{
+  "schema": 1,
+  "description": "Summarize text into bullet points.",
+  "execution_settings": {
+    "default": {
+      "max_tokens": 1024,
+      "temperature": 0.2
+    }
+  },
+  "input_variables": [
+    {
+      "name": "text",
+      "description": "The text to summarize",
+      "required": true
+    },
+    {
+      "name": "bulletCount",
+      "description": "Number of bullets to generate",
+      "default": "3"
+    }
+  ]
+}

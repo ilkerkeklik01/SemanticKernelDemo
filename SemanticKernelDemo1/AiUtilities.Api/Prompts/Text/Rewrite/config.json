@@ -1,0 +1,22 @@
+{
+  "schema": 1,
+  "description": "Rewrite text in a specific tone.",
+  "execution_settings": {
+      "default": {
+          "max_tokens": 2048,
+          "temperature": 0.7
+      }
+  },
+  "input_variables": [
+    {
+      "name": "text",
+      "description": "The text to rewrite",
+      "required": true
+    },
+    {
+      "name": "tone",
+      "description": "The tone of the rewrite",
+      "default": "professional"
+    }
+  ]
+}

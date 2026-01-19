@@ -1,0 +1,9 @@
+Classify the following text into exactly ONE of these labels:
+Information, Requirement, Decision, Question, Other
+
+Rules:
+- Return ONLY the label word.
+- If unsure, return Other.
+
+Text:
+{{$text}}

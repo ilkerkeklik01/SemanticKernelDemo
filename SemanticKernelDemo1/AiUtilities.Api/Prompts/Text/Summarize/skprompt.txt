@@ -1,0 +1,7 @@
+Summarize the following text into {{$bulletCount}} concise bullet points.
+Use neutral, professional language.
+Do not add new information or opinions.
+If the text is short, keep bullets very concise.
+
+Text:
+{{$text}}
