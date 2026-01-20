@@ -53,15 +53,21 @@ do
     // Add user input
     history.AddUserMessage(userInput);
 
-    // Get the response from the AI
-    var result = await chatCompletionService.GetChatMessageContentAsync(
+    var response = chatCompletionService.GetStreamingChatMessageContentsAsync(
         history,
-        executionSettings: openAIPromptExecutionSettings,
-        kernel: kernel);
-
-    // Print the results
-    Console.WriteLine("Assistant > " + result);
-
+        openAIPromptExecutionSettings,
+        kernel);
+    string result = string.Empty;
+     Console.WriteLine("Assistant > ");
+    await foreach (var messagePart in response)
+    {
+        Console.Write(messagePart);
+        result += messagePart;
+    }
+    Console.WriteLine();
+    
     // Add the message from the agent to the chat history
-    history.AddMessage(result.Role, result.Content ?? string.Empty);
-} while (userInput is not null);
+    
+    history.AddStreamingMessageAsync((IAsyncEnumerable<OpenAIStreamingChatMessageContent>)response, true);
+    
+} while (userInput?.ToLower() != "exit");
