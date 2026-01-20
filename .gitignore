@@ -55,3 +55,21 @@ nunit-*.xml
 
 #Environment variables files
 .env
+
+# Default ignored files
+/shelf/
+/workspace.xml
+
+# Rider ignored files
+/.idea.SemanticKernelDemo2.iml
+/projectSettingsUpdater.xml
+/modules.xml
+/contentModel.xml
+.idea/
+
+# Editor-based HTTP Client requests
+/httpRequests/
+
+# Datasource local storage ignored files
+/dataSources/
+/dataSources.local.xml
