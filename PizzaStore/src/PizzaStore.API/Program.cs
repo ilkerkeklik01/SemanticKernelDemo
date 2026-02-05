@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
+using PizzaStore.API.Assistant;
 using PizzaStore.API.Filters;
 using PizzaStore.Application.Extensions;
 using PizzaStore.Core.Auth.Extensions;
@@ -45,6 +46,33 @@ builder.Services.AddPersistenceServices(builder.Configuration);
 
 // Add Auth services (JWT Authentication, AuthService)
 builder.Services.AddAuthServices(builder.Configuration);
+
+// Add Assistant services (Semantic Kernel)
+builder.Services.Configure<AzureOpenAIOptions>(options =>
+{
+    options.Endpoint = builder.Configuration["AZURE_OPENAI_ENDPOINT"] ?? string.Empty;
+    options.ApiKey = builder.Configuration["AZURE_OPENAI_API_KEY"] ?? string.Empty;
+    options.Deployment = builder.Configuration["AZURE_OPENAI_DEPLOYMENT"] ?? string.Empty;
+});
+
+builder.Services.Configure<AssistantOptions>(options =>
+{
+    options.ApiBaseUrl = builder.Configuration["ASSISTANT_API_BASE_URL"];
+
+    if (int.TryParse(builder.Configuration["ASSISTANT_MAX_TOKENS"], out var maxTokens))
+    {
+        options.MaxTokens = maxTokens;
+    }
+
+    if (double.TryParse(builder.Configuration["ASSISTANT_TEMPERATURE"], out var temperature))
+    {
+        options.Temperature = temperature;
+    }
+});
+
+builder.Services.AddScoped<IAssistantOpenApiDocumentFactory, AssistantOpenApiDocumentFactory>();
+builder.Services.AddScoped<IAssistantKernelFactory, AssistantKernelFactory>();
+builder.Services.AddScoped<IAssistantService, AssistantService>();
 
 // Add Swagger/OpenAPI
 builder.Services.AddEndpointsApiExplorer();
@@ -96,6 +124,7 @@ All endpoints (except login/register) require JWT Bearer authentication.
     // Serialize enums as strings in Swagger schema
     options.UseInlineDefinitionsForEnums();
     options.SchemaFilter<EnumSchemaFilter>();
+    options.OperationFilter<AuthorizeRolesOperationFilter>();
 
     // Add JWT Bearer Authentication to Swagger
     options.AddSecurityDefinition("bearer", new OpenApiSecurityScheme
@@ -197,4 +226,3 @@ static async Task MigrateAndSeedDatabase(WebApplication app)
 
 // Make Program accessible for integration tests
 public partial class Program { }
-
