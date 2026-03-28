@@ -75,3 +75,4 @@ nunit-*.xml
 /dataSources.local.xml
 
 .DS_Store
+.gemini
