@@ -76,3 +76,8 @@ nunit-*.xml
 
 .DS_Store
 .gemini
+
+# JavaScript / Node
+**/node_modules/
+**/dist/
+**/.vite/
